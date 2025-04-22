@@ -1,0 +1,8 @@
+{
+  "name": "wsmm-news-mini-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "368953f7"
+}
