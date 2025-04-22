@@ -1,95 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Web Chat Integration</title>
-    <style>
-        /* Web Chat custom styling */
-        #webchat {
-            height: 600px;
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Embedded PVA Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .chat-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-container {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 350px;
+      height: 500px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    #webchat {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
-    <h1>Power Virtual Agent Bot</h1>
+  <div class="chat-container" id="chat-container">
     <div id="webchat"></div>
+  </div>
 
-    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
-    
-    <script>
-        (async function () {
-            const styleOptions = {
-                accent: '#000099',
-                botAvatarBackgroundColor: '#000000',
-                botAvatarImage: 'https://i.imgur.com/v0pQRJe.jpeg',
-                botAvatarInitials: ' ',
-                userAvatarBackgroundColor: '#555555',
-                userAvatarImage: 'https://i.imgur.com/Vd2rwWx.jpeg',
-                userAvatarInitials: ' ',
-                backgroundColor: '#f4f6f9',
-                bubbleBackground: '#E2E2E2',
-                bubbleTextColor: '#333333',
-                bubbleFromUserBackground: '#E2E2E2',
-                bubbleFromUserTextColor: '#333333',
-                sendBoxBackground: '#F4F4F4',
-                sendBoxTextColor: '#333333',
-                sendBoxButtonColor: '#000000',
-                avatarBorderRadius: '50%',
-                avatarSize: 40,
-                showAvatarInGroup: true,
-                bubbleBorderRadius: '8px',
-                bubbleFromUserBorderRadius: '8px',
-                bubbleNubSize: '10px',
-                bubbleFromUserNubSize: '10px',
-                sendBoxButtonColorOnFocus: '#c4005d',
-                sendBoxButtonColorOnHover: '#c4005d',
-                connectivityIconPadding: '10px',
-                connectivityMarginTopBottom: '10px',
-                notificationText: '#4A4A4A',
-                transcriptOverlayBackground: 'rgba(255, 255, 255, 0.8)',
-                transcriptOverlayPadding: '20px',
-                transcriptVerticalSpacer: '10px',
-                hideUploadButton: true,
-            };
+  <button class="chat-toggle-btn" id="chat-toggle-btn">💬</button>
 
-            const tokenEndpointURL = 'https://default11e5456089da4ecabf9ee04a061d8d.3f.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr232_operationsAssistant/directline/token?api-version=2022-03-01-preview';
-            const locale = document.documentElement.lang || 'en';
-            const apiVersion = new URL(tokenEndpointURL).searchParams.get('api-version');
+  <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+  <script>
+    const toggleBtn = document.getElementById('chat-toggle-btn');
+    const chatContainer = document.getElementById('chat-container');
 
-            const [directLineURL, token] = await Promise.all([
-                fetch(new URL(`/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`, tokenEndpointURL))
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to retrieve regional channel settings.');
-                        }
-                        return response.json();
-                    })
-                    .then(({ channelUrls }) => channelUrls.directLine.URL),
-                fetch(tokenEndpointURL)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to retrieve Direct Line token.');
-                        }
-                        return response.json();
-                    })
-                    .then(({ token }) => token)
-            ]);
+    toggleBtn.addEventListener('click', () => {
+      if (chatContainer.style.display === 'none' || chatContainer.style.display === '') {
+        chatContainer.style.display = 'flex';
+        if (!window.chatLoaded) {
+          loadBot();
+        }
+      } else {
+        chatContainer.style.display = 'none';
+      }
+    });
 
-            window.WebChat.renderWebChat({
-                directLine: window.WebChat.createDirectLine({
-                    token,
-                    domain: directLineURL
-                }),
-                locale,
-                styleOptions
-            }, document.getElementById('webchat'));
+    async function loadBot() {
+      const styleOptions = {
+        accent: '#000099',
+        botAvatarBackgroundColor: '#000000',
+        botAvatarImage: 'https://i.imgur.com/v0pQRJe.jpeg',
+        botAvatarInitials: ' ',
+        userAvatarBackgroundColor: '#555555',
+        userAvatarImage: 'https://i.imgur.com/Vd2rwWx.jpeg',
+        userAvatarInitials: ' ',
+        backgroundColor: '#f4f6f9',
+        bubbleBackground: '#E2E2E2',
+        bubbleTextColor: '#333333',
+        bubbleFromUserBackground: '#E2E2E2',
+        bubbleFromUserTextColor: '#333333',
+        sendBoxBackground: '#F4F4F4',
+        sendBoxTextColor: '#333333',
+        sendBoxButtonColor: '#000000',
+        avatarBorderRadius: '50%',
+        avatarSize: 40,
+        showAvatarInGroup: true,
+        bubbleBorderRadius: '8px',
+        bubbleFromUserBorderRadius: '8px',
+        bubbleNubSize: '10px',
+        bubbleFromUserNubSize: '10px',
+        sendBoxButtonColorOnFocus: '#c4005d',
+        sendBoxButtonColorOnHover: '#c4005d',
+        hideUploadButton: true,
+      };
 
-            document.getElementById('webchat').focus();
-        })().catch(err => console.error('Web Chat initialization failed:', err));
-    </script>
+      const tokenEndpointURL = 'https://default11e5456089da4ecabf9ee04a061d8d.3f.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr232_operationsAssistant/directline/token?api-version=2022-03-01-preview';
+      const locale = document.documentElement.lang || 'en';
+      const apiVersion = new URL(tokenEndpointURL).searchParams.get('api-version');
+
+      const [directLineURL, token] = await Promise.all([
+        fetch(new URL(`/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`, tokenEndpointURL))
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to retrieve regional channel settings.');
+            }
+            return response.json();
+          })
+          .then(({ channelUrls }) => channelUrls.directLine.URL),
+        fetch(tokenEndpointURL)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to retrieve Direct Line token.');
+            }
+            return response.json();
+          })
+          .then(({ token }) => token)
+      ]);
+
+      window.WebChat.renderWebChat({
+        directLine: window.WebChat.createDirectLine({ token, domain: directLineURL }),
+        locale,
+        styleOptions
+      }, document.getElementById('webchat'));
+
+      window.chatLoaded = true;
+    }
+  </script>
 </body>
 </html>
